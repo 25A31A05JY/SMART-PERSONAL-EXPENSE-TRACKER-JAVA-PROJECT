@@ -1,0 +1,45 @@
+             ( START )
+                 |
+                 v
+        / Display Welcome /
+                 |
+                 v
+        / Register / Login /
+                 |
+                 v
+        < Valid Login? >
+           /        \
+         No          Yes
+         |             |
+         v             v
+  / Invalid Login /  / Dashboard /
+         |             |
+         └───> Login   v
+                 < Select Option >
+                        |
+          ┌─────────────┼──────────────┐
+          |             |              |
+          v             v              v
+      Add Income   Add Expense    View Transactions
+          |             |              |
+          v             v              v
+     Store Income  Store Expense  Display Records
+          |             |
+          |             v
+          |        Check Budget
+          |             |
+          |             v
+          |       Generate Alert
+          |             |
+          └──────┬──────┘
+                 |
+                 v
+           / Dashboard /
+                 |
+                 v
+          < Logout / Exit? >
+             /       \
+            No        Yes
+            |           |
+            └──> Menu   v
+                      ( STOP )

@@ -1,0 +1,8 @@
+Introduction – Smart Personal Expense Tracker
+In today's fast-paced world, managing personal finances has become increasingly important. Many people find it difficult to keep track of their daily expenses, income and savings. Manual record-keeping can be time-consuming and may lead to errors in financial calculations.
+
+The Smart Personal Expense Tracker is a Java-based application designed to help users manage their daily financial activities efficiently. It allows users to record income and expenses, categorize transactions, set monthly budgets, monitor spending habits and track savings goals.
+
+The application provides monthly financial summaries, expense comparisons and budget alerts to help users understand their spending patterns and make better financial decisions.
+
+By using Java programming, the application aims to provide a simple, user-friendly and organized platform for effective personal financial management.

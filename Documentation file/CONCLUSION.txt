@@ -1,0 +1,22 @@
+Methodology – Smart Personal Expense Tracker
+The Smart Personal Expense Tracker follows a systematic approach to manage users' financial activities using Java programming.
+
+1. Requirement Analysis: Identify the basic requirements, including income tracking, expense management, budgeting and savings monitoring.
+
+2. User Authentication: Develop a registration and login system to provide individual access to users.
+
+3. Income and Expense Management: Allow users to enter, update and maintain their income and expense records.
+
+4. Database Management: Store user details, transactions, categories and budget information using MySQL through JDBC.
+
+5. Budget Monitoring: Allow users to set monthly budgets and monitor their spending limits.
+
+6. Expense Analysis: Calculate total income, total expenses, savings and category-wise spending.
+
+7. Alert Generation: Generate notifications when expenses approach or exceed the specified budget.
+
+8. Graphical User Interface: Develop an interactive desktop interface using Java Swing for easy navigation.
+
+9. Testing and Validation: Test all modules to ensure accurate calculations, proper data storage and reliable application performance.
+
+Final Outcome: The methodology results in a user-friendly Java application that simplifies financial tracking, promotes savings and supports better money management.

@@ -1,0 +1,417 @@
+
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
+
+class Transaction {
+    String type;
+    String category;
+    String description;
+    double amount;
+    LocalDate date;
+
+    Transaction(String type, String category,
+                String description, double amount,
+                LocalDate date) {
+        this.type = type;
+        this.category = category;
+        this.description = description;
+        this.amount = amount;
+        this.date = date;
+    }
+
+    void display() {
+        System.out.println(
+            date + " | " + type + " | " + category
+            + " | " + description + " | Rs." + amount
+        );
+    }
+}
+
+class SavingsGoal {
+    String goalName;
+    double targetAmount;
+    double savedAmount;
+
+    SavingsGoal(String goalName, double targetAmount) {
+        this.goalName = goalName;
+        this.targetAmount = targetAmount;
+        this.savedAmount = 0;
+    }
+
+    void addSavings(double amount) {
+        savedAmount += amount;
+    }
+
+    void displayGoal() {
+        System.out.println("\nGoal: " + goalName);
+        System.out.println("Target Amount: Rs." + targetAmount);
+        System.out.println("Saved Amount: Rs." + savedAmount);
+        System.out.println("Remaining Amount: Rs."
+                + Math.max(0, targetAmount - savedAmount));
+
+        double progress = Math.min(100,
+                (savedAmount / targetAmount) * 100);
+
+        System.out.printf("Progress: %.2f%%\n", progress);
+
+        if (savedAmount >= targetAmount) {
+            System.out.println("Congratulations! Goal Achieved!");
+        }
+    }
+}
+
+public class SmartExpenseTracker {
+
+    static Scanner sc = new Scanner(System.in);
+
+    static ArrayList<Transaction> transactions =
+            new ArrayList<>();
+
+    static double monthlyBudget = 0;
+
+    static SavingsGoal savingsGoal = null;
+
+    // Read a valid positive amount
+    static double readAmount(String message) {
+        while (true) {
+            try {
+                System.out.print(message);
+                double amount = Double.parseDouble(sc.nextLine());
+
+                if (amount > 0) {
+                    return amount;
+                }
+
+                System.out.println("Amount must be greater than zero.");
+
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
+    // Read a valid month in YYYY-MM format
+    static YearMonth readMonth(String message) {
+        while (true) {
+            try {
+                System.out.print(message);
+                return YearMonth.parse(sc.nextLine());
+            } catch (DateTimeParseException e) {
+                System.out.println("Enter month in YYYY-MM format.");
+            }
+        }
+    }
+
+    // Calculate total income for a month
+    static double getIncome(YearMonth month) {
+        double total = 0;
+
+        for (Transaction t : transactions) {
+            if (t.type.equals("Income")
+                    && YearMonth.from(t.date).equals(month)) {
+                total += t.amount;
+            }
+        }
+
+        return total;
+    }
+
+    // Calculate total expenses for a month
+    static double getExpenses(YearMonth month) {
+        double total = 0;
+
+        for (Transaction t : transactions) {
+            if (t.type.equals("Expense")
+                    && YearMonth.from(t.date).equals(month)) {
+                total += t.amount;
+            }
+        }
+
+        return total;
+    }
+
+    // Add income or expense
+    static void addTransaction(String type) {
+
+        System.out.print("Enter category/source: ");
+        String category = sc.nextLine();
+
+        System.out.print("Enter description: ");
+        String description = sc.nextLine();
+
+        double amount = readAmount("Enter amount: Rs.");
+
+        System.out.print("Enter date (YYYY-MM-DD) or press Enter for today: ");
+        String dateInput = sc.nextLine();
+
+        LocalDate date;
+
+        try {
+            date = dateInput.isEmpty()
+                    ? LocalDate.now()
+                    : LocalDate.parse(dateInput);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date. Transaction cancelled.");
+            return;
+        }
+
+        transactions.add(new Transaction(
+                type, category, description, amount, date));
+
+        System.out.println(type + " added successfully!");
+
+        if (type.equals("Expense")) {
+            checkBudget(YearMonth.from(date));
+        }
+    }
+
+    // Display transaction history
+    static void viewTransactions() {
+
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions available.");
+            return;
+        }
+
+        System.out.println("\n--- TRANSACTION HISTORY ---");
+
+        for (Transaction t : transactions) {
+            t.display();
+        }
+    }
+
+    // Set monthly budget
+    static void setBudget() {
+
+        monthlyBudget = readAmount("Enter monthly budget: Rs.");
+
+        System.out.println("Monthly budget set successfully!");
+
+        checkBudget(YearMonth.now());
+    }
+
+    // Generate budget alerts
+    static void checkBudget(YearMonth month) {
+
+        if (monthlyBudget <= 0) {
+            return;
+        }
+
+        double expenses = getExpenses(month);
+
+        System.out.printf("Monthly expenses: Rs.%.2f\n", expenses);
+
+        if (expenses > monthlyBudget) {
+            System.out.println("ALERT! Monthly budget exceeded!");
+        } else if (expenses >= monthlyBudget * 0.80) {
+            System.out.println("WARNING! You have used 80% or more of your budget.");
+        } else {
+            System.out.printf("Remaining budget: Rs.%.2f\n",
+                    monthlyBudget - expenses);
+        }
+    }
+
+    // Display monthly financial summary
+    static void monthlySummary() {
+
+        YearMonth month = readMonth("Enter month (YYYY-MM): ");
+
+        double income = getIncome(month);
+        double expenses = getExpenses(month);
+        double savings = income - expenses;
+
+        System.out.println("\n--- MONTHLY SUMMARY ---");
+        System.out.println("Month: " + month);
+        System.out.printf("Total Income: Rs.%.2f\n", income);
+        System.out.printf("Total Expenses: Rs.%.2f\n", expenses);
+        System.out.printf("Savings: Rs.%.2f\n", savings);
+
+        System.out.println("\nCategory-wise Expenses:");
+
+        ArrayList<String> categories = new ArrayList<>();
+
+        for (Transaction t : transactions) {
+            if (t.type.equals("Expense")
+                    && YearMonth.from(t.date).equals(month)
+                    && !categories.contains(t.category)) {
+                categories.add(t.category);
+            }
+        }
+
+        for (String category : categories) {
+            double total = 0;
+
+            for (Transaction t : transactions) {
+                if (t.type.equals("Expense")
+                        && t.category.equalsIgnoreCase(category)
+                        && YearMonth.from(t.date).equals(month)) {
+                    total += t.amount;
+                }
+            }
+
+            System.out.printf("%s: Rs.%.2f\n", category, total);
+        }
+
+        if (expenses > 0) {
+            String highestCategory = "";
+            double highestExpense = 0;
+
+            for (String category : categories) {
+                double total = 0;
+
+                for (Transaction t : transactions) {
+                    if (t.type.equals("Expense")
+                            && t.category.equalsIgnoreCase(category)
+                            && YearMonth.from(t.date).equals(month)) {
+                        total += t.amount;
+                    }
+                }
+
+                if (total > highestExpense) {
+                    highestExpense = total;
+                    highestCategory = category;
+                }
+            }
+
+            System.out.println("Highest Spending Category: "
+                    + highestCategory);
+        }
+    }
+
+    // Compare expenses of two months
+    static void compareExpenses() {
+
+        YearMonth month1 = readMonth("Enter first month (YYYY-MM): ");
+        YearMonth month2 = readMonth("Enter second month (YYYY-MM): ");
+
+        double expense1 = getExpenses(month1);
+        double expense2 = getExpenses(month2);
+
+        System.out.println("\n--- EXPENSE COMPARISON ---");
+        System.out.println(month1 + ": Rs." + expense1);
+        System.out.println(month2 + ": Rs." + expense2);
+
+        double difference = Math.abs(expense1 - expense2);
+
+        if (expense1 > expense2) {
+            System.out.println("Expenses decreased by Rs." + difference);
+        } else if (expense2 > expense1) {
+            System.out.println("Expenses increased by Rs." + difference);
+        } else {
+            System.out.println("Expenses are equal in both months.");
+        }
+    }
+
+    // Create or update savings goal
+    static void manageSavings() {
+
+        if (savingsGoal == null) {
+            System.out.print("Enter savings goal name: ");
+            String name = sc.nextLine();
+
+            double target = readAmount("Enter target amount: Rs.");
+
+            savingsGoal = new SavingsGoal(name, target);
+
+            System.out.println("Savings goal created successfully!");
+        }
+
+        savingsGoal.displayGoal();
+
+        System.out.print("Do you want to add savings? (yes/no): ");
+        String choice = sc.nextLine();
+
+        if (choice.equalsIgnoreCase("yes")) {
+            double amount = readAmount("Enter savings amount: Rs.");
+
+            if (amount > savingsGoal.targetAmount - savingsGoal.savedAmount) {
+                System.out.println("Amount exceeds the remaining goal.");
+            } else {
+                savingsGoal.addSavings(amount);
+                System.out.println("Savings updated successfully!");
+            }
+
+            savingsGoal.displayGoal();
+        }
+    }
+
+    // Main dashboard
+    public static void main(String[] args) {
+
+        int choice;
+
+        System.out.println("==================================");
+        System.out.println("  SMART PERSONAL EXPENSE TRACKER");
+        System.out.println("==================================");
+
+        do {
+            System.out.println("\n----------- MAIN MENU -----------");
+            System.out.println("1. Add Income");
+            System.out.println("2. Add Expense");
+            System.out.println("3. View Transactions");
+            System.out.println("4. Set Monthly Budget");
+            System.out.println("5. View Monthly Summary");
+            System.out.println("6. Compare Monthly Expenses");
+            System.out.println("7. Manage Savings Goals");
+            System.out.println("8. View Spending Alerts");
+            System.out.println("9. Exit");
+
+            System.out.print("\nEnter your choice: ");
+
+            try {
+                choice = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid choice. Enter a number.");
+                continue;
+            }
+
+            switch (choice) {
+
+                case 1:
+                    addTransaction("Income");
+                    break;
+
+                case 2:
+                    addTransaction("Expense");
+                    break;
+
+                case 3:
+                    viewTransactions();
+                    break;
+
+                case 4:
+                    setBudget();
+                    break;
+
+                case 5:
+                    monthlySummary();
+                    break;
+
+                case 6:
+                    compareExpenses();
+                    break;
+
+                case 7:
+                    manageSavings();
+                    break;
+
+                case 8:
+                    checkBudget(YearMonth.now());
+                    break;
+
+                case 9:
+                    System.out.println("Thank you for using Smart Expense Tracker!");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+
+        } while (choice != 9);
+
+        sc.close();
+    }
+}
